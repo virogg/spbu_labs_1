@@ -1,15 +1,21 @@
 #ifndef BMP3_BITMAP_H
 #define BMP3_BITMAP_H
 
-#pragma once
-
+#pragma once  
+/* Стоит включать только те заголовники, которые напрямую используются в этом файле.
+ * При include в файл включается весь код из заголовка, что замедляет время компиляции.
+ * Помещая включения в заголовок, при включении этого заголовка в другой файл (в большом проекте
+ * один заголовок может быть включен во множество сурс-файлов) ты также вставляешь туда и лишний,
+ * ненужный там код, который в итоге замедляет компиляцию еще сильнее. Так что некоторые из этих 
+ * включений стоит перенести в сурс-файл.
+ */
 #include <fstream>
 #include <vector>
-#include "algorithm"
+#include "algorithm"   //А почему не <algorithm>?
 #include <stdexcept>
 #include <string>
 #include <iostream>
-#include "cmath"
+#include "cmath"  //<cmath>?
 
 
 #pragma pack(push, 1)
@@ -20,7 +26,10 @@ struct BMPFileHeader {
     uint16_t reserved2{0};
     uint32_t offset_data{0};
 };
-
+/* nit: Возможно, для такой учебной задачи такое обилие переменных излишне. Пользуешься же ты только двумя.
+ * Можно сказать, что это заготовка под расширение программы, но можно на это и ответить, что как будут расширять
+ * так и добавят все эти переменные.
+ */
 struct BMPInfoHeader {
     uint32_t size{0};
     int32_t width{0};
@@ -36,9 +45,15 @@ struct BMPInfoHeader {
 };
 
 #pragma pack(pop)
-
-struct BMP {
-    BMPFileHeader file_header;
+/* У тебя тут структура, в которой все поля по умолчанию public, однако в ней же ты пишешь
+ * для функций явно, что они публичны. Вероятно, ты тогда хотел написать class?
+ */
+struct BMP {  
+    /* Не знаю, какой политикой именования ты пользуешься, но может быть удобно давать полям класса
+     * (если с учетом прошлого замечания ты действительно имел в виду класс) в конце имени еще и
+     * нижнее подчеркивание. Так их в сурс-файлах можно будет отличить от локальных переменных.
+     */
+    BMPFileHeader file_header;  
     BMPInfoHeader bmp_info_header;
     char** dat;
 
@@ -51,17 +66,18 @@ public:
     BMP(const char *fname) {
         std::ifstream inp{fname, std::ios_base::binary};
         if (inp) {
-            inp.read((char *) &file_header, sizeof(file_header));
+            //Вообще приведение типов в стиле си -- очень опасная штука. Задумайся над плюсовым вариантом
+            inp.read((char *) &file_header, sizeof(file_header)); 
             if (file_header.file_type != 0x4D42) {
                 throw std::runtime_error("Error! Unrecognized file format.");
             }
             inp.read((char *) &bmp_info_header, sizeof(bmp_info_header));
-
+            
             inp.seekg(file_header.offset_data);
-            bmp_info_header.size = sizeof(BMPInfoHeader);
-            file_header.offset_data = sizeof(BMPFileHeader) + sizeof(BMPInfoHeader);
+            bmp_info_header.size = sizeof(BMPInfoHeader);  //А зачем?
+            file_header.offset_data = sizeof(BMPFileHeader) + sizeof(BMPInfoHeader); //?
 
-            file_header.file_size = file_header.offset_data;
+            file_header.file_size = file_header.offset_data;  //??
 
             if (bmp_info_header.height < 0) {
                 throw std::runtime_error("The program can treat only BMP images with the origin in the bottom left corner!");
