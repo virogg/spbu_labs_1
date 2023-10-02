@@ -16,6 +16,8 @@ void BMP::write(const char *fname) {
             }
             of.close();
         } else {
+            // Представь себе, в код-стайле гугла запрещены исключения. Я тоже считаю, что в этой программе они
+            // смотрятся хорошо, но все равно советую почитать все плюсы и минусы их использования в интернете
             throw std::runtime_error("The program can treat only 24 bits per pixel BMP files");
         }
     } else {
@@ -36,6 +38,7 @@ void BMP::rotate_right() {
         for (int j = 0; j < new_w; ++j) {
             char* pixel = new_data[i] + j * 3;
             char* originalPixel = dat[j] + (bmp_info_header.width - 1 - i) * 3;
+            // Чтоб так не делать, я бы на твоем месте завел структуру для пикселя
             pixel[0] = originalPixel[0];
             pixel[1] = originalPixel[1];
             pixel[2] = originalPixel[2];
@@ -43,7 +46,9 @@ void BMP::rotate_right() {
     }
 
     dat = new_data;
-
+    /* Утечка идет от того, что ты теряешь указатель на данные, которые считал в конструкторе, указателем на которые 
+     * и является dat
+     */
     // Не удаляю new_data => утечка памяти. Если пытаюсь удалить, то изображение, которое получается на выходе,
     // искажено. Скорее всего эта проблема возникает из-за того, что когда я пишу dat = new_data, dat обращается по
     // адресу new_data, которая была удалена. Очевидно, та же проблема при повороте в другую сторону.
@@ -53,7 +58,7 @@ void BMP::rotate_right() {
 //    }
 //    delete[] new_data;
 
-    std::swap(bmp_info_header.width, bmp_info_header.height);
+    std::swap(bmp_info_header.width, bmp_info_header.height); // Респект за говорящий код!
 }
 
 void BMP::rotate_left() {
@@ -116,7 +121,7 @@ void BMP::apply_gaussian(int radius, float sigma) {
                 b += static_cast<uint8_t>(dat[y][xOffset * 3 + 2]) * kernel[i + radius];
             }
 
-            tempImage[y][x * 3 + 0] = (char)(r);
+            tempImage[y][x * 3 + 0] = (char)(r); //Вперемешку и сишные приведения и плюсовые. Непорядок
             tempImage[y][x * 3 + 1] = (char)(g);
             tempImage[y][x * 3 + 2] = (char)(b);
         }
