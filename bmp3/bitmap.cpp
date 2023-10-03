@@ -12,13 +12,12 @@ void BMP::read(const char *fname) {
     if (inp) {
         inp.read(reinterpret_cast<char*>(&file_header_), sizeof(file_header_));
         if (file_header_.file_type != 0x4D42) {
-            std::cerr << "Error! Unrecognized file format.";
-            return;
+            throw std::runtime_error("Error! Unrecognized file format.");
         }
         inp.read(reinterpret_cast<char*>(&bmp_info_header_), sizeof(bmp_info_header_));
 
         if (bmp_info_header_.height < 0) {
-            RaiseError("The program can treat only BMP images with the origin in the bottom left corner!");
+            throw std::runtime_error("The program can treat only BMP images with the origin in the bottom left corner!");
         }
 
         dat_ = new char*[bmp_info_header_.height];
@@ -35,8 +34,7 @@ void BMP::read(const char *fname) {
 
         inp.close();
     } else {
-        RaiseError("Unable to open the input image file.");
-        return;
+        throw std::runtime_error("Unable to open the input image file.");
     }
 }
 
@@ -56,12 +54,10 @@ void BMP::write(const char *fname) {
             }
             of.close();
         } else {
-            RaiseError("The program can treat only 24 bits per pixel BMP files");
-            return;
+            throw std::runtime_error("The program can treat only 24 bits per pixel BMP files");
         }
     } else {
-        RaiseError("Unable to open the output image file.");
-        return;
+        throw std::runtime_error("Unable to open the output image file.");
     }
 }
 
