@@ -3,13 +3,13 @@
 void BMP::write(const char *fname) {
     std::ofstream of(fname, std::ios::out | std::ios::binary);
     if (of) {
-        if (bmp_info_header.bit_count == 24) {
-            of.write((const char *) &file_header, sizeof(file_header));
-            of.write((const char *) &bmp_info_header, sizeof(bmp_info_header));
+        if (bmp_info_header_.bit_count == 24) {
+            of.write(reinterpret_cast<const char*>(&file_header_), sizeof(file_header_));
+            of.write(reinterpret_cast<const char*>(&bmp_info_header_), sizeof(bmp_info_header_));
 
-            for (int i = 0; i < bmp_info_header.height; ++i) {
-                of.write(dat[i], bmp_info_header.width * 3);
-                for (int j = 0; j < (4 - (bmp_info_header.width * 3 % 4)) % 4; j++) {
+            for (int i = 0; i < bmp_info_header_.height; ++i) {
+                of.write(dat_[i], bmp_info_header_.width * 3);
+                for (int j = 0; j < (4 - (bmp_info_header_.width * 3 % 4)) % 4; j++) {
                     char paddingByte = 0;
                     of.write(&paddingByte, 1);
                 }
@@ -24,8 +24,8 @@ void BMP::write(const char *fname) {
 }
 
 void BMP::rotate_right() {
-    int new_w = bmp_info_header.height;
-    int new_h = bmp_info_header.width;
+    int new_w = bmp_info_header_.height;
+    int new_h = bmp_info_header_.width;
 
     char** new_data;
     new_data = new char *[new_h];
@@ -35,30 +35,21 @@ void BMP::rotate_right() {
     for (int i = 0; i < new_h; ++i) {
         for (int j = 0; j < new_w; ++j) {
             char* pixel = new_data[i] + j * 3;
-            char* originalPixel = dat[j] + (bmp_info_header.width - 1 - i) * 3;
+            char* originalPixel = dat_[j] + (bmp_info_header_.width - 1 - i) * 3;
             pixel[0] = originalPixel[0];
             pixel[1] = originalPixel[1];
             pixel[2] = originalPixel[2];
         }
     }
 
-    dat = new_data;
+    dat_ = new_data;
 
-    // Не удаляю new_data => утечка памяти. Если пытаюсь удалить, то изображение, которое получается на выходе,
-    // искажено. Скорее всего эта проблема возникает из-за того, что когда я пишу dat = new_data, dat обращается по
-    // адресу new_data, которая была удалена. Очевидно, та же проблема при повороте в другую сторону.
-
-//    for (int i = 0; i < bmp_info_header.height; ++i) {
-//        delete[] new_data[i];
-//    }
-//    delete[] new_data;
-
-    std::swap(bmp_info_header.width, bmp_info_header.height);
+    std::swap(bmp_info_header_.width, bmp_info_header_.height);
 }
 
 void BMP::rotate_left() {
-    int new_w = bmp_info_header.height;
-    int new_h = bmp_info_header.width;
+    int new_w = bmp_info_header_.height;
+    int new_h = bmp_info_header_.width;
 
     char** new_data;
     new_data = new char *[new_h];
@@ -68,20 +59,20 @@ void BMP::rotate_left() {
     for (int i = 0; i < new_h; ++i) {
         for (int j = 0; j < new_w; ++j) {
             char* pixel = new_data[i] + j * 3;
-            char* originalPixel = dat[bmp_info_header.height - 1 - j] + i * 3;
+            char* originalPixel = dat_[bmp_info_header_.height - 1 - j] + i * 3;
             pixel[0] = originalPixel[0];
             pixel[1] = originalPixel[1];
             pixel[2] = originalPixel[2];
         }
     }
-    dat = new_data;
+    dat_ = new_data;
 
-    std::swap(bmp_info_header.width, bmp_info_header.height);
+    std::swap(bmp_info_header_.width, bmp_info_header_.height);
 }
 
 void BMP::apply_gaussian(int radius, float sigma) {
-    int width = bmp_info_header.width;
-    int height = bmp_info_header.height;
+    int width = bmp_info_header_.width;
+    int height = bmp_info_header_.height;
 
     // Вычисляем ядро
     int kernelSize = 2 * radius + 1;
@@ -111,14 +102,14 @@ void BMP::apply_gaussian(int radius, float sigma) {
 
             for (int i = -radius; i <= radius; ++i) {
                 int xOffset = std::min(std::max(x + i, 0), width - 1);
-                r += static_cast<uint8_t>(dat[y][xOffset * 3 + 0]) * kernel[i + radius];
-                g += static_cast<uint8_t>(dat[y][xOffset * 3 + 1]) * kernel[i + radius];
-                b += static_cast<uint8_t>(dat[y][xOffset * 3 + 2]) * kernel[i + radius];
+                r += static_cast<uint8_t>(dat_[y][xOffset * 3 + 0]) * kernel[i + radius];
+                g += static_cast<uint8_t>(dat_[y][xOffset * 3 + 1]) * kernel[i + radius];
+                b += static_cast<uint8_t>(dat_[y][xOffset * 3 + 2]) * kernel[i + radius];
             }
 
-            tempImage[y][x * 3 + 0] = (char)(r);
-            tempImage[y][x * 3 + 1] = (char)(g);
-            tempImage[y][x * 3 + 2] = (char)(b);
+            tempImage[y][x * 3 + 0] = static_cast<uint8_t>(r);
+            tempImage[y][x * 3 + 1] = static_cast<uint8_t>(g);
+            tempImage[y][x * 3 + 2] = static_cast<uint8_t>(b);
         }
     }
 
@@ -134,9 +125,9 @@ void BMP::apply_gaussian(int radius, float sigma) {
                 b += static_cast<uint8_t>(tempImage[yOffset][x * 3 + 2]) * kernel[i + radius];
             }
 
-            dat[y][x * 3 + 0] = static_cast<uint8_t>(r);
-            dat[y][x * 3 + 1] = static_cast<uint8_t>(g);
-            dat[y][x * 3 + 2] = static_cast<uint8_t>(b);
+            dat_[y][x * 3 + 0] = static_cast<uint8_t>(r);
+            dat_[y][x * 3 + 1] = static_cast<uint8_t>(g);
+            dat_[y][x * 3 + 2] = static_cast<uint8_t>(b);
         }
     }
 
