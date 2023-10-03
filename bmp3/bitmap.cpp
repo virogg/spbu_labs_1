@@ -1,4 +1,40 @@
 #include "bitmap.h"
+#include <algorithm>
+#include <cmath>
+
+void BMP::read(const char *fname) {
+    std::ifstream inp{fname, std::ios_base::binary};
+    if (inp) {
+        inp.read(reinterpret_cast<char*>(&file_header_), sizeof(file_header_));
+        if (file_header_.file_type != 0x4D42) {
+            std::cerr << "Error! Unrecognized file format.";
+            return;
+        }
+        inp.read(reinterpret_cast<char*>(&bmp_info_header_), sizeof(bmp_info_header_));
+
+        if (bmp_info_header_.height < 0) {
+            std::cerr << "The program can treat only BMP images with the origin in the bottom left corner!";
+            return;
+        }
+
+        dat_ = new char*[bmp_info_header_.height];
+        for (int i = 0; i < bmp_info_header_.height; ++i) {
+            dat_[i] = new char[bmp_info_header_.width * 3];
+        }
+
+        for (int row = 0; row < bmp_info_header_.height; ++row) {
+            for (int col = 0; col < bmp_info_header_.width * 3; ++col) {
+                dat_[row][col] = inp.get();
+            }
+            inp.seekg((4 - (bmp_info_header_.width * 3 % 4)) % 4, std::ios::cur);
+        }
+
+        inp.close();
+    } else {
+        std::cerr << "Unable to open the input image file.";
+        return;
+    }
+}
 
 void BMP::write(const char *fname) {
     std::ofstream of(fname, std::ios::out | std::ios::binary);
@@ -16,10 +52,12 @@ void BMP::write(const char *fname) {
             }
             of.close();
         } else {
-            throw std::runtime_error("The program can treat only 24 bits per pixel BMP files");
+            std::cerr << "The program can treat only 24 bits per pixel BMP files";
+            return;
         }
     } else {
-        throw std::runtime_error("Unable to open the output image file.");
+        std::cerr << "Unable to open the output image file.";
+        return;
     }
 }
 

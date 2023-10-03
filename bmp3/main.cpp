@@ -1,8 +1,8 @@
-#include <iostream>
 #include "bitmap.h"
 
 int main() {
-    BMP bmp("image.bmp");
+    BMP bmp;
+    bmp.read("image.bmp");
     bmp.write("image_copy.bmp");
     bmp.rotate_left();
     bmp.write("image1_rotated_left.bmp");
