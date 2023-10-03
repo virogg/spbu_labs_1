@@ -2,11 +2,6 @@
 #include <algorithm>
 #include <cmath>
 
-void RaiseError(const char* message) {
-    std::cerr << message;
-    exit(EXIT_FAILURE);
-}
-
 void BMP::read(const char *fname) {
     std::ifstream inp{fname, std::ios_base::binary};
     if (inp) {
