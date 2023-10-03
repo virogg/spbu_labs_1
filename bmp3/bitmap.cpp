@@ -2,6 +2,11 @@
 #include <algorithm>
 #include <cmath>
 
+void RaiseError(const char* message) {
+    std::cerr << message;
+    exit(EXIT_FAILURE);
+}
+
 void BMP::read(const char *fname) {
     std::ifstream inp{fname, std::ios_base::binary};
     if (inp) {
@@ -13,8 +18,7 @@ void BMP::read(const char *fname) {
         inp.read(reinterpret_cast<char*>(&bmp_info_header_), sizeof(bmp_info_header_));
 
         if (bmp_info_header_.height < 0) {
-            std::cerr << "The program can treat only BMP images with the origin in the bottom left corner!";
-            return;
+            RaiseError("The program can treat only BMP images with the origin in the bottom left corner!");
         }
 
         dat_ = new char*[bmp_info_header_.height];
@@ -31,7 +35,7 @@ void BMP::read(const char *fname) {
 
         inp.close();
     } else {
-        std::cerr << "Unable to open the input image file.";
+        RaiseError("Unable to open the input image file.");
         return;
     }
 }
@@ -52,11 +56,11 @@ void BMP::write(const char *fname) {
             }
             of.close();
         } else {
-            std::cerr << "The program can treat only 24 bits per pixel BMP files";
+            RaiseError("The program can treat only 24 bits per pixel BMP files");
             return;
         }
     } else {
-        std::cerr << "Unable to open the output image file.";
+        RaiseError("Unable to open the output image file.");
         return;
     }
 }
@@ -66,7 +70,7 @@ void BMP::rotate_right() {
     int new_h = bmp_info_header_.width;
 
     char** new_data;
-    new_data = new char *[new_h];
+    new_data = new char* [new_h];
     for (int i = 0; i < new_h; ++i) {
         new_data[i] = new char[new_w * 3];
     }

@@ -31,12 +31,11 @@ struct BMPInfoHeader {
 };
 
 #pragma pack(pop)
-
 class BMP {
 private:
     BMPFileHeader file_header_;
     BMPInfoHeader bmp_info_header_;
-    char **dat_;
+    char** dat_;
 
 public:
     void read(const char *fname);
