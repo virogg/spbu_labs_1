@@ -14,6 +14,7 @@ struct BMPFileHeader {
     uint16_t reserved1{0};
     uint16_t reserved2{0};
     uint32_t offset_data{0};
+//    uint16_t unused[6]{ 0 };
 };
 
 struct BMPInfoHeader {
@@ -28,6 +29,7 @@ struct BMPInfoHeader {
     int32_t y_pixels_per_meter{0};
     uint32_t colors_used{0};
     uint32_t colors_important{0};
+//    uint32_t unused[16]{ 0 };
 };
 
 #pragma pack(pop)

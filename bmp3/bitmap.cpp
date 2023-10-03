@@ -84,7 +84,7 @@ void BMP::rotate_right() {
         }
     }
 
-    for (int i = 0; i < bmp_info_header_.width; ++i) {
+    for (int i = 0; i < bmp_info_header_.height; ++i) {
         delete[] dat_[i];
     }
     delete[] dat_;
@@ -112,7 +112,7 @@ void BMP::rotate_left() {
             pixel[2] = originalPixel[2];
         }
     }
-    for (int i = 0; i < bmp_info_header_.width; ++i) {
+    for (int i = 0; i < bmp_info_header_.height; ++i) {
         delete[] dat_[i];
     }
     delete[] dat_;
