@@ -11,6 +11,12 @@ void BMP::read(const char *fname) {
         }
         inp.read(reinterpret_cast<char*>(&bmp_info_header_), sizeof(bmp_info_header_));
 
+        inp.seekg(file_header_.offset_data);
+        bmp_info_header_.size = sizeof(BMPInfoHeader);
+        file_header_.offset_data = sizeof(BMPFileHeader) + sizeof(BMPInfoHeader);
+
+        file_header_.file_size = file_header_.offset_data;
+
         if (bmp_info_header_.height < 0) {
             throw std::runtime_error("The program can treat only BMP images with the origin in the bottom left corner!");
         }

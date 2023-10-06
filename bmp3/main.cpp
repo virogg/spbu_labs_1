@@ -2,7 +2,7 @@
 
 int main() {
     BMP bmp;
-    bmp.read("image.bmp");
+    bmp.read("image2.bmp");
     bmp.write("image_copy.bmp");
     bmp.rotate_left();
     bmp.write("image1_rotated_left.bmp");
