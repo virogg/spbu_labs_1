@@ -24,8 +24,8 @@ int main() {
 
     HealingItem potion_1("Potion", 20);
     HealingItem potion_2("Potion", 20);
-    BattleItem bomb_1("Bomb", 100);
-    BattleItem bomb_2("Bomb", 100);
+    BattleItem bomb_1("Bomb", 10);
+    BattleItem bomb_2("Bomb", 10);
 
     inventory1.AddItem(&potion_1);
     inventory1.AddItem(&bomb_1);
