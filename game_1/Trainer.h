@@ -1,6 +1,8 @@
 #ifndef GAME_1_TRAINER_H
 #define GAME_1_TRAINER_H
 
+#include <utility>
+
 #include "Inventory.h"
 
 class Trainer {
@@ -11,21 +13,21 @@ public:
     Inventory inventory;
     Pokemon* activePokemon;
 
-    Trainer(std::string name){
+    explicit Trainer(std::string name){
         this->name = std::move(name);
     }
     void SetInventory(Inventory inv){
-        this->inventory = inv;
+        this->inventory = std::move(inv);
     }
 
     static void UseHealingItem(HealingItem* item, Pokemon* target){
-        auto *healingItem = reinterpret_cast<HealingItem*>(item);
-        target->health += healingItem->healingPower;
-        std::cout << target->name << " has been healed by " << healingItem->healingPower << " HP.\n";
+        auto *healing_item = reinterpret_cast<HealingItem*>(item);
+        target->health += healing_item->healingPower;
+        std::cout << target->name << " has been healed by " << healing_item->healingPower << " HP.\n";
    }
     static void UseBattleItem(BattleItem* item, Pokemon* target){
-        auto *battleItem = reinterpret_cast<BattleItem*>(item);
-        target->health -= battleItem->battleDamage;
+        auto *battle_item = reinterpret_cast<BattleItem*>(item);
+        target->health -= battle_item->battleDamage;
         std::cout << "The grenade has been thrown at " << target->name << " dealing 10 damage to it!";
    }
 
@@ -44,16 +46,15 @@ public:
             }
             else std::cout << "fainted\n";
         }
-        int kChosenPokemon;
-        std::cin >> kChosenPokemon;
-        --kChosenPokemon;
+        int k_chosen_pokemon;
+        std::cin >> k_chosen_pokemon;
+        --k_chosen_pokemon;
 
 
-        if (kChosenPokemon >= 0 && kChosenPokemon < this->pokemons.size()) {
-            Pokemon* chosenPokemon = this->pokemons[kChosenPokemon];
-            if (chosenPokemon->health > 0) {
-                this->activePokemon = chosenPokemon;
-                return;
+        if (k_chosen_pokemon >= 0 && k_chosen_pokemon < this->pokemons.size()) {
+            Pokemon* chosen_pokemon = this->pokemons[k_chosen_pokemon];
+            if (chosen_pokemon->health > 0) {
+                this->activePokemon = chosen_pokemon;
             } else {
                 std::cout << "This Pokemon is fainted. Please, enter another number from the list.\n";
                 SwitchPokemon();

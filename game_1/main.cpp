@@ -1,23 +1,24 @@
-#include <iostream>
-#include <Windows.h>
 #include "BattleArena.h"
-
+#include <Windows.h>
 
 int main() {
     Trainer trainer1("Trainer_1");
     Trainer trainer2("Trainer_2");
 
-    FirePokemon firePokemon1("Charizard_1", 10), firePokemon2("Charizard_2", 10);
-    ElectricPokemon electricPokemon1("Pikachu_1", 10), electricPokemon2("Pikachu_2", 10);
-    GrassPokemon grassPokemon1("Venasaur_1", 10), grassPokemon2("Venasaur_2", 10);
+    FirePokemon fire_pokemon1("Charizard_1", 10);
+    FirePokemon fire_pokemon2("Charizard_2", 10);
+    ElectricPokemon electric_pokemon1("Pikachu_1", 10);
+    ElectricPokemon electric_pokemon2("Pikachu_2", 10);
+    GrassPokemon grass_pokemon1("Venasaur_1", 10);
+    GrassPokemon grass_pokemon2("Venasaur_2", 10);
 
-    trainer1.AddPokemon(&firePokemon1);
-    trainer1.AddPokemon(&electricPokemon1);
-    trainer1.AddPokemon(&grassPokemon1);
+    trainer1.AddPokemon(&fire_pokemon1);
+    trainer1.AddPokemon(&electric_pokemon1);
+    trainer1.AddPokemon(&grass_pokemon1);
 
-    trainer2.AddPokemon(&firePokemon2);
-    trainer2.AddPokemon(&electricPokemon2);
-    trainer2.AddPokemon(&grassPokemon2);
+    trainer2.AddPokemon(&fire_pokemon2);
+    trainer2.AddPokemon(&electric_pokemon2);
+    trainer2.AddPokemon(&grass_pokemon2);
 
     Inventory inventory1;
     Inventory inventory2;

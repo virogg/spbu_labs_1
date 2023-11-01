@@ -4,10 +4,10 @@
 #include "Trainer.h"
 
 enum class ActionType {
-    SwitchPokemon,
-    UseItem,
-    Attack,
-    Quit
+    kSwitchPokemon,
+    kUseItem,
+    kAttack,
+    kQuit
 };
 
 class BattleArena {
@@ -117,15 +117,15 @@ public:
         int choice;
         std::cin >> choice;
 
-        Pokemon* chosenPokemon = currentTrainer->pokemons[choice - 1];
+        Pokemon* chosen_pokemon = currentTrainer->pokemons[choice - 1];
 
         // Validate the choice and return the selected Pokemon
-        if (choice >= 1 && choice <= currentTrainer->pokemons.size() && !chosenPokemon->isDead) {
-            return chosenPokemon;
-        } else {
-            std::cout << "Invalid choice. Try again.\n";
-            return GetUserChoiceOfPokemon(currentTrainer); // Recursive call for invalid choices
+        if (choice >= 1 && choice <= currentTrainer->pokemons.size() && !chosen_pokemon->isDead) {
+            return chosen_pokemon;
         }
+        std::cout << "Invalid choice. Try again.\n";
+        return GetUserChoiceOfPokemon(currentTrainer); // Recursive call for invalid choices
+
     }
     // Function to get the user's choice of item
     Item* GetUserChoiceOfItem(Trainer* currentTrainer) {
@@ -144,30 +144,30 @@ public:
         // Validate the choice and return the selected item
         if (choice >= 1 && choice <= currentTrainer->inventory.items.size()) {
             return currentTrainer->inventory.items[choice - 1];
-        } else {
-            std::cout << "Invalid choice. Try again.\n";
-            return GetUserChoiceOfItem(currentTrainer); // Recursive call for invalid choices
         }
+        std::cout << "Invalid choice. Try again.\n";
+        return GetUserChoiceOfItem(currentTrainer); // Recursive call for invalid choices
+
     }
-    void ReplaceIfDead(Trainer* trainer){
+    static void ReplaceIfDead(Trainer* trainer){
         if(trainer->activePokemon->isDead){
             trainer->SwitchPokemon();
         }
     }
 
     void StartBattle() {
-        Trainer* currentTrainer = &trainer1;
-        Trainer* opponentTrainer = &trainer2;
+        Trainer* current_trainer = &trainer1;
+        Trainer* opponent_trainer = &trainer2;
         while (!battleOver) {
             if(turnCounter % 2 == 0){
-                currentTrainer = &trainer1;
-                opponentTrainer = &trainer2;
+                current_trainer = &trainer1;
+                opponent_trainer = &trainer2;
             }
             else{
-                currentTrainer = &trainer2;
-                opponentTrainer = &trainer1;
+                current_trainer = &trainer2;
+                opponent_trainer = &trainer1;
             }
-            if (opponentTrainer->kAlivePokemons == 0 || currentTrainer->kAlivePokemons == 0) {
+            if (opponent_trainer->kAlivePokemons == 0 || current_trainer->kAlivePokemons == 0) {
                 battleOver = true;
             }
             if (battleOver) {
@@ -175,16 +175,16 @@ public:
                 break;
             }
 
-            ReplaceIfDead(currentTrainer);
-            ReplaceIfDead(opponentTrainer);
+            ReplaceIfDead(current_trainer);
+            ReplaceIfDead(opponent_trainer);
 
-            DisplayBattleStatus(currentTrainer, opponentTrainer);
+            DisplayBattleStatus(current_trainer, opponent_trainer);
 
-            HandleUserAction(currentTrainer, opponentTrainer);
+            HandleUserAction(current_trainer, opponent_trainer);
 
             system("cls");
 
-            HandleTurn(currentTrainer, opponentTrainer);
+            HandleTurn(current_trainer, opponent_trainer);
 
             turnCounter++;
         }
@@ -203,13 +203,13 @@ private:
 
         switch (choice) {
             case 1:
-                return ActionType::SwitchPokemon;
+                return ActionType::kSwitchPokemon;
             case 2:
-                return ActionType::UseItem;
+                return ActionType::kUseItem;
             case 3:
-                return ActionType::Attack;
+                return ActionType::kAttack;
             case 4:
-                return ActionType::Quit;
+                return ActionType::kQuit;
             default:
                 std::cout << "Invalid choice. Try again.\n";
                 return GetUserAction();
@@ -218,17 +218,17 @@ private:
 
     // Function to handle the user's chosen action
     void HandleUserAction(Trainer* currentTrainer, Trainer* opponentTrainer) {
-        ActionType actionChoice = GetUserAction();
+        ActionType action_choice = GetUserAction();
 
-        switch (actionChoice) {
-            case ActionType::SwitchPokemon:
+        switch (action_choice) {
+            case ActionType::kSwitchPokemon:
                 currentTrainer->SwitchPokemon();
                 break;
 
-            case ActionType::UseItem: {
-                auto item = GetUserChoiceOfItem(currentTrainer);
+            case ActionType::kUseItem: {
+                auto *item = GetUserChoiceOfItem(currentTrainer);
                 if(item->name == "Potion"){
-                    auto target = GetUserChoiceOfPokemon(currentTrainer);
+                    auto *target = GetUserChoiceOfPokemon(currentTrainer);
                     currentTrainer->UseHealingItem(reinterpret_cast<HealingItem*>(item), target);
                 }else{
                     currentTrainer->UseBattleItem(reinterpret_cast<BattleItem*>(item), GetUserChoiceOfPokemon(opponentTrainer));
@@ -237,12 +237,12 @@ private:
                 break;
             }
 
-            case ActionType::Attack: {
-                auto target = GetUserChoiceOfPokemon(opponentTrainer);
+            case ActionType::kAttack: {
+                auto *target = GetUserChoiceOfPokemon(opponentTrainer);
                 HandlePokemonTurn(currentTrainer->activePokemon, target);
                 break;
             }
-            case ActionType::Quit:
+            case ActionType::kQuit:
                 battleOver = true;
                 break;
 
