@@ -14,6 +14,7 @@ public:
 
 class Pokemon {
 public:
+    /* Вновь такие вещи должны быть приватными */
     std::string name;
     int level;
     int health;
@@ -31,7 +32,14 @@ public:
         this->health = level * 10;
         this->effect.name = "None";
     }
-
+    /* Что значит защитник? Защитник чего? 
+       Апдейт через 10 минут: я думаю, это все-таки
+       должен быть enemy */
+    /* Ты ее нигде не вызываешь. Наличие просто виртуальной
+     * функции без ее использования не закрывает этот пунктик
+     * в задании. Ну и, конечно, не особенно уникальное поведение. 
+     * Ввести бы каких-то особых эффектов, типа стана или заставляющие
+     * противника сменить покемона */
     virtual void ApplyEffect(Pokemon* defender) {}
 };
 
@@ -60,6 +68,7 @@ public:
     GrassPokemon(std::string name, int level) : Pokemon(std::move(name), level) {}
 
     void ApplyEffect(Pokemon* defender) override{
+        /* Думаю, типы эффектов следовало бы сделать enum-ом (enum class)*/
         defender->effect.name = "Vines";
         defender->effect.duration = 3;
     }

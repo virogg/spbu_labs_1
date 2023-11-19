@@ -2,7 +2,7 @@
 #define GAME_1_BATTLEARENA_H
 
 #include "Trainer.h"
-
+/* гуд */
 enum class ActionType {
     kSwitchPokemon,
     kUseItem,
@@ -16,7 +16,9 @@ public:
     int turnCounter = 0;
     Trainer trainer1;
     Trainer trainer2;
-
+    /* Кажется, что при расширении игры, такая передача тренеров была бы не 
+     * очень хорошей идеей. Вот ты муваешь все их данные в арену, а потом
+     * они там и остаются. Отобрал у внешнего кода и не вернул. */
     BattleArena(Trainer tr1, Trainer tr2, const std::string& trainerName1,  const std::string& trainerName2): trainer1(trainerName1), trainer2(trainerName2) {
         this->trainer1 = std::move(tr1);
         this->trainer2 = std::move(tr2);
@@ -49,11 +51,15 @@ public:
     }
 
     // Function to calculate damage based on the type advantages, attack power, etc.
+    /* Почему снова статик? Ты же в любом случае будешь создавать экземпляр арены
+     * для битвы */
     static int CalculateDamage(Pokemon* attacker, Pokemon* defender) {
+        /* То есть дамага потенциально отрицательная? */
         int damage = (attacker->level * attacker->attackPower) - (defender->level * defender->defensePower);
         return damage;
     }
-
+    /* Не думаю, что эта функциональность должна находиться тут. 
+     * это явно не зона ответственности арены */
     static void RemovePokemon(Trainer* trainer){
         for(auto & pokemon : trainer->pokemons){
             if(pokemon->health <= 0 && !pokemon->isDead){
@@ -65,6 +71,7 @@ public:
     }
 
     // Function to check and remove status conditions at the end of a turn
+    /* Это тоже не здесь должно быть. В общем там и далее так, так что думай */
     static void RemoveStatusConditions(Pokemon* pokemon) {
         pokemon->effect.name = "None";
         pokemon->effect.duration = 0;

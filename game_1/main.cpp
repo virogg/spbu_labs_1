@@ -1,5 +1,5 @@
 #include "BattleArena.h"
-#include <Windows.h>
+#include <Windows.h> /* Не смогу поиграть */
 
 int main() {
     Trainer trainer1("Trainer_1");
@@ -19,7 +19,12 @@ int main() {
     trainer2.AddPokemon(&fire_pokemon2);
     trainer2.AddPokemon(&electric_pokemon2);
     trainer2.AddPokemon(&grass_pokemon2);
-
+    /* Ты хранишь в экземплярах нескольких классов указатели
+     * на временные объекты. Конкретно в данной программе из-за этого
+     * ничего не ломается, но малейшие изменения приведут к ошибкам. 
+     * Если хранишь указатели, то создавай объекты в куче, а потом
+     * удаляй их (чтобы не париться с удалением можно переехать на 
+     * умные указатели)*/
     Inventory inventory1;
     Inventory inventory2;
 
