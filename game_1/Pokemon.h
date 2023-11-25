@@ -4,64 +4,79 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <ctime>
+#include "Effect.h"
 
 class Effect {
 public:
-    std::string name;
-    int duration = 5;
+    EffectType type_;
+    int duration_ = 0;
+    Effect(EffectType type) {
+        type_ = type;
+    }
 };
 
 class Pokemon {
+private:
+    std::string name_;
+    int level_;
+    int health_;
+
+
+    friend class Trainer;
+    friend class BattleArena;
 public:
-    std::string name;
-    int level;
-    int health;
     Effect effect;
     int attackPower = 7;
     int defensePower = 2;
     bool isDead = false;
+    bool isStunned = false;
 
     bool HasStatusCondition() const{
-        return effect.name != "None";
+        return effect.type_ != EffectType::kNone;
     }
-    Pokemon(std::string name, int level){
-        this->name = std::move(name);
-        this->level = level;
-        this->health = level * 10;
-        this->effect.name = "None";
+    Pokemon(std::string name, int level, Effect effect) : effect(effect) {
+        this->name_ = std::move(name);
+        this->level_ = level;
+        this->health_ = level * 10;
+        this->effect = EffectType::kNone;
+    }
+    // Function to check and remove status conditions at the end of a turn
+    void RemoveStatusConditions() {
+        this->effect = EffectType::kNone;
     }
 
-    virtual void ApplyEffect(Pokemon* defender) {}
+    virtual void ApplyEffect(Pokemon* enemy) {
+        //????
+    }
 };
 
 class FirePokemon : public Pokemon {
 public:
-    FirePokemon(std::string name, int level) : Pokemon(std::move(name), level) {}
+    FirePokemon(std::string name, int level) : Pokemon(std::move(name), level, Effect(EffectType::kShock)) {}
 
-    void ApplyEffect(Pokemon* defender) override{
-        defender->effect.name = "Fire";
-        defender->effect.duration = 3;
+    void ApplyEffect(Pokemon* enemy) override{
+        enemy->effect = EffectType::kFire;
+        enemy->effect.duration_ = 3;
     }
 };
 
 class ElectricPokemon : public Pokemon {
 public:
-    ElectricPokemon(std::string name, int level) : Pokemon(std::move(name), level) {}
+    ElectricPokemon(std::string name, int level) : Pokemon(std::move(name), level, Effect(EffectType::kShock)) {}
 
-    void ApplyEffect(Pokemon* defender) override{
-        defender->effect.name = "Electricity";
-        defender->effect.duration = 3;
+    void ApplyEffect(Pokemon* enemy) override{
+        enemy->effect = EffectType::kShock;
     }
 };
 
 class GrassPokemon : public Pokemon {
 public:
-    GrassPokemon(std::string name, int level) : Pokemon(std::move(name), level) {}
+    GrassPokemon(std::string name, int level) : Pokemon(std::move(name), level, Effect(EffectType::kShock)) {}
 
-    void ApplyEffect(Pokemon* defender) override{
-        defender->effect.name = "Vines";
-        defender->effect.duration = 3;
+    void ApplyEffect(Pokemon* enemy) override{
+        enemy->effect = EffectType::kStun;
+        enemy->isStunned = true;
+        enemy->effect.duration_ = 1;
     }
 };
 

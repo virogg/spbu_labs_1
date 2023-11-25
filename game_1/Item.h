@@ -4,26 +4,27 @@
 #include "Pokemon.h"
 
 class Item {
-public:
-    std::string name;
+protected:
+    int power_;
+    std::string name_;
+
+    friend class Trainer;
+    friend class BattleArena;
 };
 
 class HealingItem : public Item {
 public:
-    int healingPower;
     HealingItem(std::string name, int healingPower){
-        this->name = std::move(name);
-        this->healingPower = healingPower;
+        this->name_ = std::move(name);
+        this->power_ = healingPower;
     }
 };
 
 class BattleItem : public Item {
 public:
-    int battleDamage;
-
-    BattleItem(std::string name, int power){
-        this->name = std::move(name);
-        this->battleDamage = power;
+    BattleItem(std::string name, int damagePower){
+        this->name_ = std::move(name);
+        this->power_ = damagePower;
     }
 };
 

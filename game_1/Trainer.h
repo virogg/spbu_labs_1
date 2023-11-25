@@ -2,66 +2,55 @@
 #define GAME_1_TRAINER_H
 
 #include <utility>
-
+#include <memory>
 #include "Inventory.h"
 
 class Trainer {
+private:
+    int kAlivePokemons_ = 0;
+    std::string name_;
+    std::vector<Pokemon*> pokemons_;
+
+    friend class BattleArena;
 public:
-    int kAlivePokemons = 0;
-    std::string name;
-    std::vector<Pokemon*> pokemons;
     Inventory inventory;
     Pokemon* activePokemon;
 
-    explicit Trainer(std::string name){
-        this->name = std::move(name);
-    }
-    void SetInventory(Inventory inv){
+    explicit Trainer(std::string  name) : name_(std::move(name)){}
+    inline void SetInventory(Inventory inv){
         this->inventory = std::move(inv);
     }
 
-    static void UseHealingItem(HealingItem* item, Pokemon* target){
-        auto *healing_item = reinterpret_cast<HealingItem*>(item);
-        target->health += healing_item->healingPower;
-        std::cout << target->name << " has been healed by " << healing_item->healingPower << " HP.\n";
-   }
-    static void UseBattleItem(BattleItem* item, Pokemon* target){
-        auto *battle_item = reinterpret_cast<BattleItem*>(item);
-        target->health -= battle_item->battleDamage;
-        std::cout << "The grenade has been thrown at " << target->name << " dealing 10 damage to it!";
-   }
-
-    void AddPokemon(Pokemon* pokemon){
-        this->pokemons.push_back(pokemon);
-        this->activePokemon = pokemon;
-        ++kAlivePokemons;
+    inline void UseHealingItem(HealingItem* item, Pokemon* target){
+        target->health_ += item->power_;
+        std::cout << target->name_ << " has been healed by " << item->power_ << " HP.\n";
+    }
+    inline void UseBattleItem(BattleItem* item, Pokemon* target){
+        target->health_ -= item->power_;
+        std::cout << "The grenade has been thrown at " << target->name_ << " dealing 10 damage to it!";
     }
 
-    void SwitchPokemon() {
-        std::cout << "Choose one of your pokemons. Enter the number of it:\n";
-        for (int i = 1; i < this->pokemons.size() + 1; ++i) {
-            std::cout << i << ".\t" <<  this->pokemons[i - 1]->name << "\t";
-            if(!this->pokemons[i-1]->isDead){
-                std::cout << this->pokemons[i - 1]->health << "\n";
+    inline void AddPokemon(Pokemon *pokemon){
+        this->pokemons_.push_back(pokemon);
+        this->activePokemon = pokemon;
+        ++kAlivePokemons_;
+    }
+    void RemovePokemon(){
+        for(auto & pokemon : this->pokemons_){
+            if(pokemon->health_ <= 0 && !pokemon->isDead){
+                std::cout << pokemon->name_ << " is dead!\n";
+                pokemon->isDead = true;
+                this->kAlivePokemons_ -= 1;
             }
-            else std::cout << "fainted\n";
         }
-        int k_chosen_pokemon;
-        std::cin >> k_chosen_pokemon;
-        --k_chosen_pokemon;
+    }
+    void SwitchPokemon();
+    void SwitchPokemonToRandom();
 
-
-        if (k_chosen_pokemon >= 0 && k_chosen_pokemon < this->pokemons.size()) {
-            Pokemon* chosen_pokemon = this->pokemons[k_chosen_pokemon];
-            if (chosen_pokemon->health > 0) {
-                this->activePokemon = chosen_pokemon;
-            } else {
-                std::cout << "This Pokemon is fainted. Please, enter another number from the list.\n";
-                SwitchPokemon();
-            }
-        } else {
-            std::cout << "Invalid choice. Please enter a valid number from the list!\n";
-            SwitchPokemon();
+    inline void ReplaceIfDead(){
+        if(this->activePokemon->isDead || this->activePokemon->isStunned){
+            std::cout << "Your active pokemon is " << (this->activePokemon->isDead ? "fainted" : "stunned") << ". Please, choose another one:\n";
+            this->SwitchPokemon();
         }
     }
 };
