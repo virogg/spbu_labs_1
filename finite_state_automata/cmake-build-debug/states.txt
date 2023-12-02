@@ -1,0 +1,3 @@
+q0 false true
+q1 false true
+q2 true false

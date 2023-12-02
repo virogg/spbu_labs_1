@@ -1,0 +1,3 @@
+C:/Users/Lenovo/CLionProjects/game_1/finite_state_automata/cmake-build-debug/CMakeFiles/finite_state_automata.dir
+C:/Users/Lenovo/CLionProjects/game_1/finite_state_automata/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Lenovo/CLionProjects/game_1/finite_state_automata/cmake-build-debug/CMakeFiles/rebuild_cache.dir
