@@ -25,6 +25,7 @@ private:
     friend class Trainer;
     friend class BattleArena;
 public:
+    /* Странно иметь эти поля публичными */
     Effect effect;
     int attackPower = 7;
     int defensePower = 2;
@@ -44,7 +45,8 @@ public:
     void RemoveStatusConditions() {
         this->effect = EffectType::kNone;
     }
-
+    /* Можно оставить без реализации. Если у тебя не может быть просто покемона типа Pokemon,
+     * то можно удалить реализацию, написав = 0 */
     virtual void ApplyEffect(Pokemon* enemy) {
         //????
     }
@@ -52,6 +54,8 @@ public:
 
 class FirePokemon : public Pokemon {
 public:
+    /* Тут в списке инициализации ты уровень не инициализируешь и странное значение
+     * эффекта */
     FirePokemon(std::string name, int level) : Pokemon(std::move(name), level, Effect(EffectType::kShock)) {}
 
     void ApplyEffect(Pokemon* enemy) override{

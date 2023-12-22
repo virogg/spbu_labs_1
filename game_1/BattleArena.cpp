@@ -1,5 +1,8 @@
 #include "BattleArena.h"
 
+/* Тут получилась слишком тесная связь, между двумя этими классами. Есть
+ * ощущение, что должен быть отдельный класс StatusCond, который будет сам
+ * за собой следить и вызывать нужные методы. */
 void BattleArena::ApplyStatusConditions(Trainer* trainer) {
     for (Pokemon* pokemon : trainer->pokemons_) {
         if(pokemon->effect.type_ == EffectType::kShock){
@@ -177,6 +180,7 @@ void BattleArena::HandleUserAction(Trainer* currentTrainer, Trainer* opponentTra
             auto *item = GetUserChoiceOfItem(currentTrainer);
             if(item->name_ == "Potion"){
                 Pokemon* target = GetUserChoiceOfPokemon(currentTrainer);
+                /* Это должен быть другой каст: dynamic_cast */
                 currentTrainer->UseHealingItem(reinterpret_cast<HealingItem*>(item), target);
             }else{
                 currentTrainer->UseBattleItem(reinterpret_cast<BattleItem*>(item), GetUserChoiceOfPokemon(opponentTrainer));
