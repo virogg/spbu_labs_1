@@ -7,7 +7,7 @@ class Item {
 protected:
     int power_;
     std::string name_;
-
+    /* Я не думаю, что тут это необходимо. Достаточно просто геттеров */
     friend class Trainer;
     friend class BattleArena;
 };
